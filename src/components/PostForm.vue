@@ -58,9 +58,20 @@ function removeBlob(index) {
 }
 
 async function submitPost() {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+
+  if (userError || !user) {
+    alert('You must be logged in to create a post.')
+    return
+  }
+
   const payload = {
     title: title.value,
-    blobs: blobs.value
+    blobs: blobs.value,
+    user_id: user.id,
   }
 
   const { data, error } = await supabase

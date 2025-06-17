@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Profile from '@/views/Profile.vue'
+import Feed from '@/views/Feed.vue'
 import PostForm from '../components/PostForm.vue'
 import AuthForm from '../components/Auth.vue'
+import ProfileSettings from '../views/ProfileSettings.vue'
 import { supabase } from '../supabase'
 
 const router = createRouter({
@@ -10,25 +11,38 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Profile,
+      component: Feed,
       meta: { requiresAuth: true },
     },
     {
-      path: '/auth', component: AuthForm
+      path: '/auth', name: 'auth', component: AuthForm
     },
     {
       path: '/createPost', name: 'post', component: PostForm, meta: { requiresAuth: true }
-    }
+    }, 
+    {
+      path: '/viewPost/:id',
+      name: 'viewPost',
+      component: () => import('../components/ViewPost.vue'),
+      meta: { requiresAuth: true }
+    },
+    { path: '/profile-settings', name: 'profile-settings', component: ProfileSettings, meta: { requiresAuth: true } },
   ]
 })
 
 router.beforeEach(async (to, _from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  if (!requiresAuth) {
+    return next()
+  }
+
   const { data } = await supabase.auth.getUser()
   const user = data.user
-  if (to.meta.requiresAuth && !user) {
-    next('/auth')
-  } else {
+
+  if (user) {
     next()
+  } else {
+    next({ name: 'auth' })
   }
 })
 
