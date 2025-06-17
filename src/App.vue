@@ -1,23 +1,31 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+import { supabase } from './supabase'
 import { RouterView } from 'vue-router';
 import Navbar from './components/Navbar.vue';
-
 import PostForm from './components/PostForm.vue';
 
+const user = ref(null)
+
+async function fetchUser() {
+  const { data } = await supabase.auth.getUser()
+  user.value = data.user
+}
+
+onMounted(() => {
+  fetchUser()
+  supabase.auth.onAuthStateChange((_event, session) => {
+    user.value = session?.user ?? null
+  })
+})
 </script>
 
 
 
-
-
 <template>
-  <Navbar/>
+  <Navbar v-if="user" />
   <RouterView/>
-  <PostForm/>
 </template>
-
-
-
 
 
 <style scoped>
