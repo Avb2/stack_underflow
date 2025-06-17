@@ -1,6 +1,9 @@
 <script setup>
 import { RouterView } from 'vue-router';
 import Navbar from './components/Navbar.vue';
+
+import PostForm from './components/PostForm.vue';
+
 </script>
 
 
@@ -10,6 +13,7 @@ import Navbar from './components/Navbar.vue';
 <template>
   <Navbar/>
   <RouterView/>
+  <PostForm/>
 </template>
 
 
